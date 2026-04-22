@@ -174,6 +174,13 @@
     .signup a:hover {
       color: #b13af0;
     }
+
+    .auth-status {
+      min-height: 18px;
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: #64748b;
+    }
   </style>
 </head>
 <body>
@@ -207,13 +214,86 @@
     <div class="social">
       <button class="icon-btn fb" aria-label="Facebook" type="button">f</button>
       <button class="icon-btn tw" aria-label="Twitter" type="button">t</button>
-      <button class="icon-btn gp" aria-label="Google" type="button">g+</button>
+      <button class="icon-btn gp" id="google-login-btn" aria-label="Google" type="button">g+</button>
     </div>
+    <p class="auth-status" id="auth-status"></p>
 
     <p class="signup">
       Don't have an account?
       <a href="#">Sign up</a>
     </p>
   </main>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    // Replace this with your own OAuth 2.0 Client ID from Google Cloud Console.
+    const GOOGLE_CLIENT_ID = "20152676828-0mj9mksflotukobljmiafpvd2jakipii.apps.googleusercontent.com";
+    const googleButton = document.getElementById("google-login-btn");
+    const authStatus = document.getElementById("auth-status");
+
+    function setStatus(message, isError = false) {
+      authStatus.textContent = message;
+      authStatus.style.color = isError ? "#db4437" : "#64748b";
+    }
+
+    function startGoogleLogin() {
+      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+        setStatus("Google Auth is still loading. Try again in a second.", true);
+        return;
+      }
+
+      if (GOOGLE_CLIENT_ID.startsWith("YOUR_GOOGLE_CLIENT_ID")) {
+        setStatus("Set your Google Client ID before using Google login.", true);
+        return;
+      }
+
+      if (window.location.protocol === "file:") {
+        setStatus("Run this page on localhost (not file://) for Google login.", true);
+        return;
+      }
+
+      const tokenClient = window.google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: "openid email profile",
+        callback: (response) => {
+          if (response.error || !response.access_token) {
+            setStatus("Google login failed. Please try again.", true);
+            return;
+          }
+
+          fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+            headers: {
+              Authorization: "Bearer " + response.access_token
+            }
+          })
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error("Could not fetch Google profile.");
+              }
+              return res.json();
+            })
+            .then((profile) => {
+              setStatus("Signed in as " + profile.email);
+
+              // Send the access token to your backend if needed.
+              // For production, prefer auth code flow + backend token exchange.
+              // Example:
+              // fetch("/api/auth/google", {
+              //   method: "POST",
+              //   headers: { "Content-Type": "application/json" },
+              //   body: JSON.stringify({ accessToken: response.access_token })
+              // });
+            })
+            .catch(() => {
+              setStatus("Google login succeeded, but profile fetch failed.", true);
+            });
+        }
+      });
+
+      tokenClient.requestAccessToken({ prompt: "consent" });
+    }
+
+    googleButton.addEventListener("click", startGoogleLogin);
+  </script>
 </body>
 </html>
