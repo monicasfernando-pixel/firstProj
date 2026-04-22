@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <style>
+    :root {
+      --bg-left: #69d1f0;
+      --bg-right: #c02cf4;
+      --card-bg: #ffffff;
+      --text-main: #2e3440;
+      --text-muted: #96a0b5;
+      --input-border: #eceff5;
+      --button-start: #ff5ec7;
+      --button-end: #bb2bf3;
+      --shadow: 0 18px 40px rgba(30, 42, 75, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(130deg, var(--bg-left), var(--bg-right));
+      color: var(--text-main);
+    }
+
+    .card {
+      width: min(360px, 90vw);
+      background: var(--card-bg);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      padding: 34px 30px 28px;
+      text-align: center;
+    }
+
+    .title {
+      margin: 2px 0 18px;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .subtitle {
+      margin: 0 0 22px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .input-row {
+      text-align: left;
+      margin-bottom: 12px;
+    }
+
+    .input-row label {
+      display: block;
+      color: #616f8c;
+      font-size: 12px;
+      margin: 0 0 6px;
+    }
+
+    .input-row input {
+      width: 100%;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      padding: 11px 12px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .input-row input:focus {
+      border-color: #ca74f3;
+      box-shadow: 0 0 0 3px rgba(202, 116, 243, 0.15);
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0 16px;
+      font-size: 12px;
+    }
+
+    .remember {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    .remember input {
+      accent-color: #be3bf4;
+    }
+
+    .forgot {
+      text-decoration: none;
+      color: #7f8ea8;
+    }
+
+    .forgot:hover {
+      color: #b13af0;
+    }
+
+    .btn {
+      width: 100%;
+      border: 0;
+      border-radius: 20px;
+      padding: 11px 14px;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      background: linear-gradient(90deg, var(--button-start), var(--button-end));
+      box-shadow: 0 8px 18px rgba(192, 44, 244, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(192, 44, 244, 0.45);
+    }
+
+    .divider {
+      margin: 22px 0 14px;
+      font-size: 12px;
+      color: #9aa3b8;
+      position: relative;
+    }
+
+    .social {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .icon-btn {
+      border: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .fb { background: #3b5998; }
+    .tw { background: #1da1f2; }
+    .gp { background: #db4437; }
+
+    .signup {
+      margin: 0;
+      color: #9aa3b8;
+      font-size: 12px;
+    }
+
+    .signup a {
+      color: #6e7e99;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .signup a:hover {
+      color: #b13af0;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1 class="title">Login</h1>
+    <p class="subtitle">Please sign in to continue</p>
+
+    <form>
+      <div class="input-row">
+        <label for="email">Username</label>
+        <input id="email" type="text" placeholder="Enter your username" />
+      </div>
+
+      <div class="input-row">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Enter your password" />
+      </div>
+
+      <div class="actions">
+        <label class="remember">
+          <input type="checkbox" />
+          Remember me
+        </label>
+        <a class="forgot" href="#">Forgot Password?</a>
+      </div>
+
+      <button class="btn" type="submit">LOGIN</button>
+    </form>
+
+    <p class="divider">Or login with</p>
+    <div class="social">
+      <button class="icon-btn fb" aria-label="Facebook" type="button">f</button>
+      <button class="icon-btn tw" aria-label="Twitter" type="button">t</button>
+      <button class="icon-btn gp" aria-label="Google" type="button">g+</button>
+    </div>
+
+    <p class="signup">
+      Don't have an account?
+      <a href="#">Sign up</a>
+    </p>
+  </main>
+</body>
+</html>
