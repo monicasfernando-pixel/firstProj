@@ -45,18 +45,46 @@ from spotify_client import (
 # ── Broken-loop icon (inline SVG — swap body of BREAK_LOOP_SVG with your artwork) ──
 # The SVG below is a placeholder circular-arrow-with-break in Spotify green.
 # Paste your own SVG between the triple-quotes to replace it.
-BREAK_LOOP_SVG = """<svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M36 10 A26 26 0 1 1 13.6 52" stroke="#1ed760" stroke-width="5" stroke-linecap="round" fill="none"/>
-  <polyline points="10,44 13.6,52 22,48" stroke="#1ed760" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <line x1="44" y1="28" x2="56" y2="28" stroke="#1ed760" stroke-width="5" stroke-linecap="round"/>
+BREAK_LOOP_SVG = """<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circular loop arc: 320° clockwise, center(32,32), r=22 -->
+  <!-- Start top (32,10) → clockwise → end upper-left (18,15) leaving a ~40° gap -->
+  <path d="M32 10 A22 22 0 1 1 18 15"
+        stroke="#1ed760" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  <!-- Arrowhead at (18,15) pointing in clockwise travel direction -->
+  <path d="M26 13 L18 15 L22 7"
+        stroke="#1ed760" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- AI sparkle — 4-pointed star upper-right, white so visible on any bg -->
+  <path d="M50 10 L51.3 14.2 L55.5 15.5 L51.3 16.8 L50 21 L48.7 16.8 L44.5 15.5 L48.7 14.2 Z"
+        fill="#ffffff" opacity="0.92"/>
+  <!-- Small accent dot for depth -->
+  <circle cx="43" cy="8" r="2" fill="#1ed760" opacity="0.7"/>
 </svg>"""
+
+_favicon_path = Path(__file__).parent / "assets" / "BreakloopIcon.png"
+
+# Use the PNG for page_icon if available (PIL required by Streamlit for image icons)
+try:
+    from PIL import Image as _PILImage
+    _page_icon = _PILImage.open(_favicon_path) if _favicon_path.exists() else "↺"
+except Exception:
+    _page_icon = "↺"
 
 st.set_page_config(
     page_title="Break the Loop",
-    page_icon="🔄",
+    page_icon=_page_icon,
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+# Belt-and-suspenders: also inject <link rel="icon"> so the tab picks it up
+# even if PIL wasn't available above.
+if _favicon_path.exists():
+    _favicon_b64 = base64.b64encode(_favicon_path.read_bytes()).decode()
+    st.markdown(
+        f'<link rel="icon" type="image/png" href="data:image/png;base64,{_favicon_b64}" />'
+        f'<link rel="shortcut icon" type="image/png" href="data:image/png;base64,{_favicon_b64}" />',
+        unsafe_allow_html=True,
+    )
 
 # ---------------------------------------------------------------- Spotify UI theme
 st.markdown(
@@ -191,19 +219,19 @@ st.markdown(
   }
   .st-key-tile_break_loop button {
     width: 100% !important; min-height: 72px !important; height: 72px !important;
-    background-color: rgba(30,215,96,0.15) !important;
+    background-color: #1a2a1a !important;
     background-repeat: no-repeat !important;
-    background-position: 14px center !important;
-    background-size: 56px 56px !important;
-    color: #fff !important; border: 1px solid rgba(30,215,96,0.35) !important;
+    background-position: 10px center !important;
+    background-size: 52px 52px !important;
+    color: #fff !important; border: 1px solid rgba(30,215,96,0.4) !important;
     border-radius: 6px !important;
-    text-align: left !important; padding: 0 14px 0 78px !important;
+    text-align: left !important; padding: 0 14px 0 72px !important;
     font-weight: 700 !important; font-size: 15px !important;
     justify-content: flex-start !important; box-shadow: none !important;
   }
   .st-key-tile_break_loop button:hover:not(:disabled) {
-    background-color: rgba(30,215,96,0.25) !important;
-    border-color: rgba(30,215,96,0.6) !important;
+    background-color: #1f3320 !important;
+    border-color: #1ed760 !important;
     color: #fff !important;
   }
   .st-key-tile_break_loop button:disabled {
@@ -266,6 +294,20 @@ st.markdown(
     margin: 28px 0 14px; letter-spacing: -0.02em;
   }
   .back-nav { margin-bottom: 1rem; }
+
+  /* Visible border on text inputs */
+  [data-testid="stTextInput"] input {
+    border: 1.5px solid rgba(255,255,255,0.25) !important;
+    border-radius: 6px !important;
+    background: #282828 !important;
+    color: #fff !important;
+  }
+  [data-testid="stTextInput"] input:focus {
+    border-color: #1ed760 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(30,215,96,0.18) !important;
+  }
+  [data-testid="stTextInput"] input::placeholder { color: #727272 !important; }
 </style>
 """,
     unsafe_allow_html=True,
@@ -731,12 +773,14 @@ def render_home(
     # "connected" = real Spotify auth OR demo mode loaded
     demo_active = st.session_state.get("demo_mode", False)
     connected = (sp is not None and profile is not None) or demo_active
-    icon_uri = _icon_data_uri("break_the_loop_icon.png")
-
-    if icon_uri:
+    # Use PNG icon for the home tile button background
+    _icon_path = Path(__file__).parent / "assets" / "BreakloopIcon.png"
+    if _icon_path.exists():
+        _icon_b64 = base64.b64encode(_icon_path.read_bytes()).decode()
+        _icon_uri = f"data:image/png;base64,{_icon_b64}"
         st.markdown(
             f"<style>.st-key-tile_break_loop button {{"
-            f"background-image: url('{icon_uri}') !important;}}</style>",
+            f"background-image: url('{_icon_uri}') !important;}}</style>",
             unsafe_allow_html=True,
         )
 
@@ -1026,9 +1070,10 @@ def render_break_the_loop(
                 if col.button(example, use_container_width=True, key=f"chip_{example}"):
                     st.session_state["intent_val"] = example
                     st.rerun()
-            # Commit typed value
+            # Commit typed value and immediately collapse Step 2
             if intent.strip():
                 st.session_state["intent_val"] = intent.strip()
+                st.rerun()
 
         intent = st.session_state.get("intent_val", "")
         taste_text = _taste_text
@@ -1155,10 +1200,16 @@ def render_break_the_loop(
         if found:
             subtitle += f" · {found} resolved on Spotify (♡ to save)"
 
+        _cover_icon_path = Path(__file__).parent / "assets" / "BreakloopIcon.png"
+        _cover_icon_uri = (
+            f"data:image/png;base64,{base64.b64encode(_cover_icon_path.read_bytes()).decode()}"
+            if _cover_icon_path.exists() else ""
+        )
+
         st.markdown(
             f"""
 <div class="playlist-card">
-  <div class="cover" style="display:flex;align-items:center;justify-content:center;">{BREAK_LOOP_SVG}</div>
+  <div class="cover" style="display:flex;align-items:center;justify-content:center;padding:0;overflow:hidden;"><img src="{_cover_icon_uri}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" alt="" /></div>
   <div class="meta">
     <div class="sub">Break the Loop · right now</div>
     <h2>Your steer batch</h2>

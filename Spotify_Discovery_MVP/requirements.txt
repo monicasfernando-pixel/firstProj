@@ -2,3 +2,4 @@ streamlit>=1.58.0
 anthropic>=0.111.0
 spotipy>=2.26.0
 requests>=2.34.0
+Pillow>=10.0.0
